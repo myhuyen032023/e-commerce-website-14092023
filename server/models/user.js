@@ -1,5 +1,7 @@
 const mongoose = require('mongoose'); // Erase if already required
 const bcrypt = require('bcrypt');
+const crypto = require("crypto");
+
 
 // Declare the Schema of the Mongo model
 var userSchema = new mongoose.Schema({
@@ -25,7 +27,8 @@ var userSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
-    role: [{type: mongoose.Types.ObjectId, ref: 'Product'}],
+    role: {
+        type: String, default: 'user'},   
     cart: {
         type: Array,
         default: []
@@ -64,6 +67,25 @@ userSchema.pre('save', async function(next) {
     const salt = bcrypt.genSaltSync(10);
     this.password = await bcrypt.hash(this.password, salt);
 })
+
+// Dinh nghia ham kiem tra password
+
+userSchema.methods = {
+    isCorrectPassword: async function(password) {
+        return await bcrypt.compare(password, this.password)
+    },
+
+    createPasswordChangedToken: async function()  {
+        // Tao token moi 
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        this.passwordResetExpires = Date.now() + 15 * 60 * 1000; // het han 15 phut
+    
+        return resetToken;
+    
+    }
+
+}
 
 //Export the model
 module.exports = mongoose.model('User', userSchema);
