@@ -14,6 +14,8 @@ const createProduct = asyncHandler(async(req, res) => {
     })
 })
 
+// filter sorting pagination
+
 const getProduct = asyncHandler(async(req, res) => {
     const {pid} = req.params
     if (!pid) throw new Error("Missing Inputs")
@@ -25,12 +27,63 @@ const getProduct = asyncHandler(async(req, res) => {
 })
 
 const getProducts = asyncHandler(async(req, res) => {
-    const products = await Product.find();
-    return res.status(200).json({
-        success: products ? true : false,
-        products: products ? products : "Cannot get products"
+    const queries = {...req.query};
+    //Tach cac truong dac biet khoi queries
+    const excludeFields = ["limit", "sort", "page", "fields"]; 
+    excludeFields.forEach(el => delete queries[el])
+
+
+    //Format lai cac operators cho dung cu phap mongoose
+    let queryString = JSON.stringify(queries)
+    queryString = queryString.replace(/\b(gt|gte|lt|lte)\b/g, machedEl => `$${machedEl}`)
+    const formatedQueries = JSON.parse(queryString);
+
+    //Filtering
+    if (queries?.title) formatedQueries.title = {$regex: queries.title, $options: "i"}
+    let queryCommand = Product.find(formatedQueries);
+
+    
+    //Sorting
+    if (req.query.sort) {
+        const sortBy = req.query.sort.split(',').join(' ')
+        console.log(sortBy)
+        queryCommand = queryCommand.sort(sortBy);
+        
+    }
+    
+
+    // Fields limiting
+    if (req.query.fields) {
+        const fields = req.query.fields.split(',').join(' ')
+        queryCommand = queryCommand.select(fields);
+    }
+    
+    // Pagination
+    const page = +req.query.page || 1; // page number
+    const limit = +req.query.limit || process.env.LIMIT_PRODUCTS; //So bai trong 1 trang
+    const skip = (page - 1) * limit;  //Tong so bai da bo qua (Tong so bai o truoc trang nay)
+    queryCommand.skip(skip).limit(limit);
+
+    //Execute command
+    queryCommand.exec(async(err, response) => {
+        if (err) throw new Error(err.message)
+        
+        const counts = await Product.find(formatedQueries).countDocuments()
+    
+            return res.status(200).json({
+                
+                success: response ? true : false,
+                counts,
+                products: response ? response : "Cannot get products",
+                
+            })
     })
-})
+
+    
+
+   
+    
+});
 
 const updateProduct = asyncHandler(async(req, res) => {
     const {pid} = req.params
@@ -53,10 +106,48 @@ const deleteProduct = asyncHandler(async(req, res) => {
     })
 })
 
+const ratings = asyncHandler(async(req, res) => {
+    const {_id} = req.user;
+    const {star, comment, pid} = req.body;
+    if (!star || !pid) throw new Error("Missing Input")
+
+    const ratingProduct = await Product.findById(pid);
+    const alreadyRating = ratingProduct?.ratings.find(el => el.postedBy.toString() === _id)
+
+    console.log({alreadyRating})
+    if (alreadyRating) {
+        // update star & comment
+        await Product.updateOne({
+            ratings: { $elemMatch: alreadyRating}
+        }, {
+            $set: {"ratings.$.star": star, "ratings.$.comment": comment}
+        }, {new: true})
+    } else {
+        // add star & comment
+        await Product.findByIdAndUpdate(pid, {
+            $push: {ratings: {star, comment, postedBy: _id}}
+        }, {new: true})
+
+        console.log(response)
+    }
+
+    //sum ratings
+    const updatedProduct = await Product.findById(pid)
+    const ratingCount = updatedProduct.ratings.length
+    const sumRatings = updatedProduct.ratings.reduce((sum, el) => sum + +el.star, 0)
+    updatedProduct.totolRatings = Math.round(sumRatings * 10 / ratingCount) /10
+
+    return res.status(200).json({
+        status: true
+    })
+})
+
+
 module.exports = {
     createProduct,
     getProduct,
     getProducts,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    ratings
 }
