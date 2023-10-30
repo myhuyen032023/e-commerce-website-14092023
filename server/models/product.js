@@ -9,11 +9,11 @@ var productSchema = new mongoose.Schema({
     slug: {
         type: String,
         required: true,
-        unique: true,
+        // unique: true,
         lowercase: true
     },
     description: {
-        type: String,
+        type: Array,
         required: true
     },
     brand: {
@@ -25,8 +25,8 @@ var productSchema = new mongoose.Schema({
         required: true
     },
     category: {
-        type: mongoose.Types.ObjectId,
-        ref: "Category"
+        type: String,
+        required: true
     },
     quantity: {
         type: Number,
@@ -36,12 +36,16 @@ var productSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    thumb: {
+        type: String,
+        required: true
+    },
     images: {
         type: Array
     },
     color: {
         type: String,
-        enum: ["Black", "Grown", "Red"]
+        require: true
     },
     ratings: [
         {
@@ -50,7 +54,7 @@ var productSchema = new mongoose.Schema({
             comment: {type: String}
         }
     ],
-    totolRatings: {
+    totalRatings: {
         type: Number,
         default: 0
     }

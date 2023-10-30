@@ -37,16 +37,25 @@ const getProducts = asyncHandler(async(req, res) => {
     let queryString = JSON.stringify(queries)
     queryString = queryString.replace(/\b(gt|gte|lt|lte)\b/g, machedEl => `$${machedEl}`)
     const formatedQueries = JSON.parse(queryString);
-
+    let colorQueryObject = {}
     //Filtering
     if (queries?.title) formatedQueries.title = {$regex: queries.title, $options: "i"}
-    let queryCommand = Product.find(formatedQueries);
+    if (queries?.category) formatedQueries.category = {$regex: queries.category, $options: "i"}
+    if (queries?.color) {
+        delete formatedQueries.color
+        const colorArr = queries.color?.split(",")
+        const colorQuery = colorArr.map(el => ({color: { $regex:el, $options: 'i'}}))
+        colorQueryObject = {$or: colorQuery}
+    }
+    const q = {...colorQueryObject, ...formatedQueries}
+    // console.log(colorQueryObject)
+    let queryCommand = Product.find(q);
 
     
     //Sorting
     if (req.query.sort) {
         const sortBy = req.query.sort.split(',').join(' ')
-        console.log(sortBy)
+        // console.log(sortBy)
         queryCommand = queryCommand.sort(sortBy);
         
     }
@@ -68,7 +77,7 @@ const getProducts = asyncHandler(async(req, res) => {
     queryCommand.exec(async(err, response) => {
         if (err) throw new Error(err.message)
         
-        const counts = await Product.find(formatedQueries).countDocuments()
+        const counts = await Product.find(q).countDocuments()
     
             return res.status(200).json({
                 
@@ -114,7 +123,7 @@ const ratings = asyncHandler(async(req, res) => {
     const ratingProduct = await Product.findById(pid);
     const alreadyRating = ratingProduct?.ratings.find(el => el.postedBy.toString() === _id)
 
-    console.log({alreadyRating})
+    // console.log({alreadyRating})
     if (alreadyRating) {
         // update star & comment
         await Product.updateOne({
@@ -128,7 +137,7 @@ const ratings = asyncHandler(async(req, res) => {
             $push: {ratings: {star, comment, postedBy: _id}}
         }, {new: true})
 
-        console.log(response)
+        // console.log(response)
     }
 
     //sum ratings
@@ -138,9 +147,22 @@ const ratings = asyncHandler(async(req, res) => {
     updatedProduct.totolRatings = Math.round(sumRatings * 10 / ratingCount) /10
 
     return res.status(200).json({
-        status: true
+        status: true,
+        updatedProduct
     })
 })
+
+const uploadProductImage = asyncHandler(async(req, res) => {
+    const {pid} = req.params
+    if (!req.files) throw new Error("Missing Inputs")
+    const response = await Product.findByIdAndUpdate(pid, {$push: {images: {$each: req.files.map(el => el.path)}}}, {new: true})
+    return res.status(200).json({
+        success: response ? true : false,
+        updatedProduct: response ? response : "Cannot upload product images"
+    })
+})
+
+
 
 
 module.exports = {
@@ -149,5 +171,6 @@ module.exports = {
     getProducts,
     updateProduct,
     deleteProduct,
-    ratings
+    ratings,
+    uploadProductImage
 }

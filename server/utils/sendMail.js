@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 
 
 // Ham gui email ve cho user
-const sendMail = asyncHandler(async ({email, html}) => {
+const sendMail = asyncHandler(async ({email, html, subject}) => {
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 465,
@@ -18,7 +18,7 @@ const sendMail = asyncHandler(async ({email, html}) => {
       const info = await transporter.sendMail({
         from: '"Cuahangdientu" <no-reply@cuahangdientu.com>', // sender address
         to: email, // list of receivers
-        subject: "Forgot password", // Subject line
+        subject: subject, // Subject line
         html: html, // html body
       });
     

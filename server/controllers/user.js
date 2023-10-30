@@ -5,33 +5,87 @@ const {generateAccessToken, generateRefreshToken} = require('../middlewares/jwt'
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail");
 const crypto = require("crypto");
+const makeToken = require("uniqid")
 
+// const register = asyncHandler(async(req, res) => {
+//     const {email, password, firstname, lastname} = req.body;
+//     if (!email || !password || !lastname || !firstname) 
+//     return res.status(400).json({
+//         success: false,
+//         mes: 'Missing inputs'
+//     })
+
+//     //Kiem tra xem email da dang ki chua
+//     const user = await User.findOne({email});
+//     if (user) {
+//         throw new Error('User has existed!');
+//     } else {
+//         const newUser = await User.create(req.body);
+//         return res.status(200).json({
+//         success: newUser ? true : false,
+//         mes: newUser ? 'Register is successfully. Please go into Login' : 'Something went wrong'
+//         })
+//     }
+// })
+
+//Dang ki co xac thuc email
 const register = asyncHandler(async(req, res) => {
-    const {email, password, firstname, lastname} = req.body;
-    if (!email || !password || !lastname || !firstname) 
+    const {email, password, firstname, lastname, mobile} = req.body;
+    if (!email || !password || !lastname || !firstname || !mobile) 
     return res.status(400).json({
-        sucess: false,
+        success: false,
         mes: 'Missing inputs'
     })
 
-    //Kiem tra xem email da dang ki chua
+    // Kiem tra xem email da dang ki chua
     const user = await User.findOne({email});
     if (user) {
         throw new Error('User has existed!');
     } else {
-        const newUser = await User.create(req.body);
-        return res.status(200).json({
-        success: newUser ? true : false,
-        mes: newUser ? 'Register is successfully. Please go into Login' : 'Something went wrong'
+        const token = makeToken()
+        res.cookie('dataregister', {... req.body, token}, {httpOnly: true, maxAge: 15 * 60 * 1000})
+        const html = `Vui lòng click vào link dưới đây để hoàn tất quá trình đăng kí. Link sẽ hết hạn trong 15 phút tới. 
+        <a href=${process.env.URL_SERVER}/api/user/finalregister/${token}>Click here</a>`;
+        
+
+        await sendMail({email, html, subject: "Hoàn tất đăng kí Digital World"})
+
+        return res.json({
+            success: true,
+            mes: "Please check your email to activate account"
         })
     }
+    
 })
+
+
+const finalRegister = asyncHandler(async(req, res) => {
+    const cookie = req.cookies
+    const {token} = req.params
+
+    if (!cookie || cookie?.dataregister?.token !== token) {
+        res.clearCookie('dataregister')
+        return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`)
+    } 
+    const newUser = await User.create({
+        email: cookie?.dataregister.email,
+        password: cookie?.dataregister.password,
+        mobile: cookie?.dataregister.mobile,
+        firstname: cookie?.dataregister.firstname,
+        lastname: cookie?.dataregister.lastname,
+        
+    });
+    res.clearCookie('dataregister')
+    if (newUser) return res.redirect(`${process.env.CLIENT_URL}/finalregister/success`)
+    else return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`)
+})
+
 
 const login = asyncHandler(async(req, res) => {
     const {email, password} = req.body;
     if (!email || !password) 
     return res.status(400).json({
-        sucess: false,
+        success: false,
         mes: 'Missing inputs'
     })
 
@@ -109,7 +163,7 @@ const logout = asyncHandler(async(req, res) => {
 // Change password
 
 const forgotPassword = asyncHandler(async(req, res) => {
-    const {email} = req.query
+    const {email} = req.body
     if (!email) throw new Error("Missing email")
     const user = await User.findOne({email})
     if (!user) throw new Error("User not found")
@@ -117,22 +171,24 @@ const forgotPassword = asyncHandler(async(req, res) => {
     await user.save();
 
     const html = `Vui lòng click vào link dưới đây để thay đổi mật khẩu của bạn. Link sẽ hết hạn trong 15 phút tới. 
-    <a href=${process.env.URL_SERVER}/api/user/reset-password/${await resetToken.then()}>Click here</a>`;
+    <a href=${process.env.CLIENT_URL}/reset-password/${await resetToken.then()}>Click here</a>`;
 
     const data = {
         email,
-        html
+        html,
+        subject: "Forgot password"
     }
 
     const result = await sendMail(data);
     res.status(200).json({
-        success: true,
-        result
+        success: result.response?.includes('OK') ? true : false,
+        mes: result.response?.includes('OK') ? "Check your mail please" : "Something went wrong. Please try again"
     })
 })
 
 const resetPassword = asyncHandler(async(req, res) => {
     const {token, password} = req.body;
+    // console.log({token, password})
     if (!token || !password) throw new Error("Missing Inputs")
     const passwordResetToken = crypto.createHash('sha256').update(token).digest('hex');
     const user = await User.findOne({passwordResetToken, passwordResetExpires: {$gt: Date.now()}});
@@ -189,6 +245,43 @@ const updateUserByAdmin = asyncHandler(async(req, res) => {
     })
 })
 
+const updateCart  = asyncHandler(async(req, res) => {
+    const {_id} = req.user;
+    const {pid, quantity, color} = req.body
+    if(!pid || !quantity || !color) throw new Error('Missing Inputs')
+    const user = await User.findById(_id).select('cart')
+    const alreadyProduct = user?.cart?.find(el => el.product.toString() === pid)
+    //alreadyProduct da co _id rieng de phan biet product cua user nay voi user khac
+    // console.log(alreadyProduct)
+    if (alreadyProduct){
+        if (alreadyProduct.color === color) {
+            // Cung mau thi chi update lai quantity thoi
+            // updateOne: update user ma co cart chua element trung voi alreadyProduct -> chi co 1 user dat product do thoi (vi no co _id rieng)
+            const response = await User.updateOne({cart: {$elemMatch   : alreadyProduct}}, {$set: {"cart.$.quantity": quantity}}, {new : true})
+            return res.status(200).json({
+                success: response ? true : false,
+                updatedUser: response ? response : 'Something went wrong'
+            })
+        } else {
+            // Khac mau thi them nhu them san pham moi
+            const response = await User.findByIdAndUpdate(_id, {$push: {cart: {product: pid, quantity, color}}}, {new: true})
+            return res.status(200).json({
+                success: response ? true : false,
+                updatedUser: response ? response : 'Something went wrong'
+            })
+        }
+        
+    } else {
+        const response = await User.findByIdAndUpdate(_id, {$push: {cart: {product: pid, quantity, color}}}, {new: true})
+        return res.status(200).json({
+            success: response ? true : false,
+            updatedUser: response ? response : 'Something went wrong'
+        })
+    }
+    
+})
+
+
 module.exports = {
     register,
     login,
@@ -200,7 +293,9 @@ module.exports = {
     getUsers,
     deleteUser,
     updateUser,
-    updateUserByAdmin
+    updateUserByAdmin,
+    updateCart,
+    finalRegister
 }
 
 

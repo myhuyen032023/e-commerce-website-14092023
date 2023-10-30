@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const ctrls = require('../controllers/product');
 const {verifyAccessToken, isAdmin} = require("../middlewares/verifyToken");
+const fileUploader = require('../config/cloudinary.config');
 
 //Guest & user
 router.put('/ratings', verifyAccessToken, ctrls.ratings);
@@ -11,6 +12,7 @@ router.get('/', ctrls.getProducts);
 //Admin
 router.post('/', [verifyAccessToken, isAdmin],ctrls.createProduct);
 router.put('/:pid', [verifyAccessToken, isAdmin],ctrls.updateProduct);
+router.put('/uploadimage/:pid', [verifyAccessToken, isAdmin], fileUploader.array('images'),ctrls.uploadProductImage); //upload file key: image
 router.delete('/:pid', [verifyAccessToken, isAdmin],ctrls.deleteProduct);
 
 
