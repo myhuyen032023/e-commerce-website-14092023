@@ -57,3 +57,7 @@ background-clip: padding-box;
 
 margin-bottom: 30px;
 }
+
+.code {
+    white-space: initial;
+}

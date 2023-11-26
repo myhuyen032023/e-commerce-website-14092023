@@ -1,11 +1,16 @@
 import React, {useState, useEffect, useCallback} from 'react'
 import {useParams} from 'react-router-dom'
-import { apiGetProduct, apiGetProducts } from '../../apis'
+import { apiGetProduct, apiGetProducts, apiUpdateCart } from 'apis'
 import Slider from 'react-slick'
-import { formatMoney, renderStarFromNumber } from '../../utils/helpers'
-import { Button, SelectQuantity, ProductExtraInfoItem, ProductInformation, CustomSlider } from '../../components'
-import {productExtraInfoItem} from '../../utils/constants'
-
+import { formatMoney, renderStarFromNumber } from 'utils/helpers'
+import { Button, SelectQuantity, ProductExtraInfoItem, ProductInformation, CustomSlider } from 'components'
+import {productExtraInfoItem} from 'utils/constants'
+import DOMPurify from 'dompurify';
+import { useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
+import withBaseComponent from 'hocs/withBaseComponent'
+import { getCurrent } from 'store/user/asyncActions'
+import { getNewProducts } from 'store/products/asyncActions'
 const settings = {
   dots: false,
   infinite: true,
@@ -14,7 +19,8 @@ const settings = {
   slidesToScroll: 1
 };
 
-const DetailProduct = () => {
+const DetailProduct = ({dispatch}) => {
+  const {current} = useSelector(state => state.user)
   const {pid, title, category} = useParams()
   const [product, setProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
@@ -45,14 +51,24 @@ const DetailProduct = () => {
       fetchProductData()
       fetchProducts()
     }
-  }, [pid])
+  }, [pid, current])
   
   const handleChangeQuantity = useCallback((flag) => {
       if (flag === 'minus' && quantity === 1) return
       if (flag === 'minus') setQuantity(prev => +prev - 1)
       if (flag === 'plus') setQuantity(prev => +prev + 1)
   }, [quantity])
+console.log(product)
+  const handleAddToCart = async() => {
+    
+      if(!current) return toast.info('Please login first')
+      console.log({pid: product?._id, color: product?.color})
+      const response = await apiUpdateCart({pid: product?._id, color: product?.color})
+      if(response.success) toast.success('Add to Cart Successfully!')
+      else toast.error('Something went wrong')
 
+    dispatch(getCurrent())
+  }
   return (
     <div className='w-full'>
       <div className='h-[81px] bg-gray-100 flex items-center justify-center'>
@@ -106,8 +122,9 @@ const DetailProduct = () => {
               {renderStarFromNumber(product?.totalRatings)}
               <span className='text-sm italic text-main'>{`(Sold: ${product?.sold})`}</span>
             </div>
-            <ul className='text-sm text-gray-500 list-disc pl-4 '>{product?.description?.map((el, index) => (<li key={index} className='leading-6' >{el}</li>))}</ul>
-        
+            <ul className='text-sm text-gray-500 list-disc pl-4 '>
+              {product?.description?.length > 1 && product?.description?.map((el, index) => (<li key={index} className='leading-6' >{el}</li>))}</ul>
+              {product?.description?.length === 1 && <div className='text-sm line-clamp-[10] mb-8' dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(product?.description[0])}}></div>}
             <div className='flex flex-col gap-8'>
               <div className='flex items-center gap-4'>
                 <span className='font-semibold'>Quantity </span>
@@ -117,7 +134,7 @@ const DetailProduct = () => {
                   handleChangeQuantity={handleChangeQuantity}
                   />
               </div>
-              <Button name="Add to Cart" fullWidth/>
+              {!current?.cart?.some(el => el.product._id === product?._id.toString()) ? <Button fullWidth handleOnClick={() => {handleAddToCart()}}>Add to Cart</Button> : <Button fullWidth >Added To Cart</Button>}
             </div>
         </div>
         <div className='w-1/5'>
@@ -150,4 +167,4 @@ const DetailProduct = () => {
   )
 }
 
-export default DetailProduct
+export default withBaseComponent(DetailProduct)

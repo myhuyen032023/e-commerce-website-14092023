@@ -1,5 +1,5 @@
 import React , {memo, useState} from 'react'
-import { productInfoTabs } from '../utils/constants'
+import { productInfoTabs } from 'utils/constants'
 
 const ProductInformation = () => {
     const [activedTab, setActivedTab] = useState(1)

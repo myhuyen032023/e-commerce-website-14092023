@@ -1,8 +1,8 @@
 import React, { useEffect, useState, memo } from 'react'
-import icons from '../utils/icons'
-import { apiGetProducts } from '../apis/product'
-import { formatMoney, renderStarFromNumber } from '../utils/helpers'
-import {CountDown} from './'
+import icons from 'utils/icons'
+import { apiGetProducts } from 'apis/product'
+import { formatMoney, renderStarFromNumber } from 'utils/helpers'
+import CountDown from 'components/Common/CountDown'
 
 const {AiFillStar, AiOutlineMenu} = icons
 let idInterval

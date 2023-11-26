@@ -1,6 +1,6 @@
 import React, {memo} from 'react'
 import Slider from 'react-slick'
-import {Product} from './'
+import Product from 'components/Products/Product';
 const settings = {
     dots: false,
     infinite: true,

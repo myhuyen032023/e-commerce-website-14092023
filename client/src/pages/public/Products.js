@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { Product , SearchItem} from '../../components'
 import { apiGetProducts } from '../../apis'
 import Masonry from 'react-masonry-css'
+import { queries } from '@testing-library/react'
 
 const breakpointColumnsObj = {
   default: 4,
@@ -11,13 +12,17 @@ const breakpointColumnsObj = {
   500: 1
 };
 
-const Products = () => {
+const Products = ({q}) => {
   const [products, setProducts] = useState([])
   const [activeClick, setActiveClick] = useState(null)
   const [params] = useSearchParams()
+  const {category} = useParams()
   
   const fetchProductsByCategory = async(queries) => {
-    const response = await apiGetProducts(queries);
+    let data = {}
+    if (category !== ':category') data = {...queries, category}
+    else data = queries
+    const response = await apiGetProducts(data);
     if(response.success) setProducts(response.products)
   }
 
@@ -54,7 +59,6 @@ const Products = () => {
     if(activeClick === name) setActiveClick(null)
     else setActiveClick(name)
   }, [activeClick])
-  const {category} = useParams()
 
   console.log(category)
   return (

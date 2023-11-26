@@ -1,14 +1,14 @@
 import React, {useState, useCallback, useEffect} from 'react'
-import login_bg from '../../assets/login-bg-4.jpg'
-import { apiRegister, apiLogin, apiForgotPassword } from '../../apis/user'
-import {InputField, Button} from '../../components'
+import login_bg from 'assets/login-bg-4.jpg'
+import { apiRegister, apiLogin, apiForgotPassword } from 'apis/user'
+import {InputField, Button} from 'components'
 import Swal from 'sweetalert2'
 import { useNavigate, Link } from 'react-router-dom'
-import path from '../../utils/path'
-import {login} from '../../store/user/userSlice'
+import path from 'utils/path'
+import {login} from 'store/user/userSlice'
 import {useDispatch} from 'react-redux'
 import {toast} from 'react-toastify'
-import {validate} from '../../utils/helpers'
+import { validate } from 'utils/helpers'
 
 const Login = () => {
   const navigate = useNavigate()
@@ -104,8 +104,8 @@ const Login = () => {
           />
 
           <div className='flex items-center justify-end w-full gap-4'>
-            <Button name='Submit' style='px-4 py-2 rounded-md text-white bg-blue-500 my-2 text-semibold' handleOnClick={handleForgotPassword}/>
-            <Button name='Back' handleOnClick={() => setUserForgotPassword(false)}/>
+            <Button handleOnClick={handleForgotPassword}>Submit</Button> 
+            <Button handleOnClick={() => setUserForgotPassword(false)}>Back</Button>
           </div>
         </div>
 
@@ -126,6 +126,7 @@ const Login = () => {
             nameKey='firstname'
             invalidField={invalidField}
             setInvalidField={setInvalidField}
+            
           />
           <InputField 
             value={payload.lastname}
@@ -165,11 +166,8 @@ const Login = () => {
             setInvalidField={setInvalidField}
           />
 
-          <Button 
-            name={isRegister ? 'Register' : 'Login'}
-            handleOnClick={handleSubmit}
-            fullWidth
-          />
+          <Button handleOnClick={handleSubmit}
+            fullWidth>{isRegister ? 'Register' : 'Login'}</Button>
           
             
           

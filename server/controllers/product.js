@@ -4,8 +4,14 @@ const slugify = require("slugify");
 
 
 const createProduct = asyncHandler(async(req, res) => {
-    if (Object.keys(req.body).length===0) throw new Error("Missing Inputs")
-    if (req.body && req.body.title) req.body.slug = slugify(req.body.title)
+    const {title, price, description, brand, category, color } = req.body
+    const thumb = req.files?.thumb[0]?.path
+    const images = req.files?.images?.map(el => el.path)
+
+    if (!(title && price && description && brand && category && color && thumb && images)) throw new Error("Missing Inputs")
+    req.body.slug = slugify(title)
+    if(thumb) req.body.thumb = thumb
+    if (images) req.body.images = images
     const newProduct = await Product.create(req.body)
 
     return res.status(200).json({
@@ -19,7 +25,13 @@ const createProduct = asyncHandler(async(req, res) => {
 const getProduct = asyncHandler(async(req, res) => {
     const {pid} = req.params
     if (!pid) throw new Error("Missing Inputs")
-    const product = await Product.findById(pid);
+    const product = await Product.findById(pid).populate({
+        path: 'ratings',
+        populate: {
+            path: 'postedBy',
+            select: 'firstname lastname avatar'
+        }
+    });
     return res.status(200).json({
         success: product ? true : false,
         productData: product ? product : "Cannot get product"
@@ -47,9 +59,39 @@ const getProducts = asyncHandler(async(req, res) => {
         const colorQuery = colorArr.map(el => ({color: { $regex:el, $options: 'i'}}))
         colorQueryObject = {$or: colorQuery}
     }
-    const q = {...colorQueryObject, ...formatedQueries}
+
+    let queryObject = {}
+
+    if (queries?.q) {
+        delete formatedQueries.q
+        queryObject = { $or: [
+            {color: { $regex:queries.q, $options: 'i'}},
+            {title: { $regex:queries.q, $options: 'i'}},
+            {category: { $regex:queries.q, $options: 'i'}},
+            {brand: { $regex:queries.q, $options: 'i'}},
+            {description: { $regex:queries.q, $options: 'i'}},
+
+        ]}
+    }
+
+
+
+
+    const qr = {...colorQueryObject, ...formatedQueries, ...queryObject}
+
+
+
+    //
+    if (req.query.q) {
+        delete formatedQueries.q
+        formatedQueries['$or'] = [
+            {title : {$regex: req.query.q, $options: "i"}},
+            {category : {$regex: req.query.q, $options: "i"}},
+            {color: {$regex: req.query.q, $options: "i"}}
+        ]
+    }
     // console.log(colorQueryObject)
-    let queryCommand = Product.find(q);
+    let queryCommand = Product.find(qr);
 
     
     //Sorting
@@ -73,11 +115,13 @@ const getProducts = asyncHandler(async(req, res) => {
     const skip = (page - 1) * limit;  //Tong so bai da bo qua (Tong so bai o truoc trang nay)
     queryCommand.skip(skip).limit(limit);
 
+    
+
     //Execute command
     queryCommand.exec(async(err, response) => {
         if (err) throw new Error(err.message)
         
-        const counts = await Product.find(q).countDocuments()
+        const counts = await Product.find(qr).countDocuments()
     
             return res.status(200).json({
                 
@@ -96,7 +140,9 @@ const getProducts = asyncHandler(async(req, res) => {
 
 const updateProduct = asyncHandler(async(req, res) => {
     const {pid} = req.params
-    if (!pid) throw new Error("Missing Inputs")
+    const files = req?.files
+    if (files?.thumb) req.body.thumb = files.thumb[0]?.path
+    if (files?.images) req.body.images = files?.images?.map(el => el.path)
     if (req.body && req.body.title) req.body.slug = slugify(req.body.title)
     const updatedProduct = await Product.findByIdAndUpdate(pid, req.body, {new: true});
     return res.status(200).json({

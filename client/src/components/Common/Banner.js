@@ -1,5 +1,5 @@
-import React from 'react'
-import banner from '../assets/banner.jpg'
+import React, {memo} from 'react'
+import banner from 'assets/banner.jpg'
 const Banner = () => {
   return (
     <div className='w-full'>
@@ -8,4 +8,4 @@ const Banner = () => {
   )
 }
 
-export default Banner
+export default memo(Banner)

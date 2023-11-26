@@ -27,8 +27,12 @@ var userSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
+    avatar: {
+        type: String
+    },
     role: {
-        type: String, default: 'user'},   
+        type: String,
+         default: 'user'},   
     cart: [{
         product: {type: mongoose.Types.ObjectId, ref: 'Product'},
         quantity: Number,

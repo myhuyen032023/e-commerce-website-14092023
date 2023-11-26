@@ -135,3 +135,87 @@ export const colors = [
     'green',
     'blue'
 ]
+
+export const adminSidebar = [
+    {
+        id: 1,
+        type: 'single',
+        text: 'DASHBOARD',
+        path: `/${path.ADMIN}/${path.DASHBOARD}`
+    },
+    {
+        id: 2,
+        type: 'single',
+        text: 'USER MANAGEMENT',
+        path: `/${path.ADMIN}/${path.MANAGE_USER}`
+    },
+    {
+        id: 3,
+        type: 'parent',
+        text: 'PRODUCT MANAGEMENT',
+        submenu: [
+            {
+                text: 'Create Product',
+                path: `/${path.ADMIN}/${path.CREATE_PRODUCT}`
+            },
+            {
+                text: 'Manage Products',
+                path: `/${path.ADMIN}/${path.MANAGE_PRODUCT}`
+            }
+        ]
+        
+    },
+    {
+        id: 4,
+        type: 'single',
+        text: 'ORDER MANAGEMENT',
+        path: `/${path.ADMIN}/${path.MANAGE_ORDER}`
+    }
+]
+export const memberSidebar = [
+    {
+        id: 1,
+        type: 'single',
+        text: 'Personal',
+        path: `/${path.MEMBER}/${path.PERSONAL}`
+    },
+    {
+        id: 2,
+        type: 'single',
+        text: 'My Cart',
+        path: `/${path.MEMBER}/${path.MY_CART}`
+    },
+    {
+        id: 3,
+        type: 'single',
+        text: 'Buy History',
+        path: `/${path.MEMBER}/${path.HISTORY}`
+    },
+    {
+        id: 4,
+        type: 'single',
+        text: 'Wishlist',
+        path: `/${path.MEMBER}/${path.WISHLIST}`
+    },
+]
+export const roles = [
+    {
+        code: 'admin',
+        value: 'admin'
+    },
+    {
+        code: 'user',
+        value: 'user'
+    }
+]
+
+export const blockStatus = [
+    {
+        code: true,
+        value: 'Blocked'
+    },
+    {
+        code: false,
+        value: 'Active'
+    }
+]

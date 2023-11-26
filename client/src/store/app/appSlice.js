@@ -8,9 +8,9 @@ export const appSlice = createSlice({
         isLoading: false
     },
     reducers: {
-        // logout: (state) => {
-        //     state.isLoading = false
-        // }
+        showCart: (state) => {
+            state.isShowCart = !state.isShowCart
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(actions.getCategories.pending, (state) => {
@@ -32,7 +32,7 @@ export const appSlice = createSlice({
     }
 })
 
-
+export const {showCart} = appSlice.actions
 
 
 export default appSlice.reducer
