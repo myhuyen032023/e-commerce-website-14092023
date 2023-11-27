@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { logout } from 'store/user/userSlice'
 import withBaseComponent from 'hocs/withBaseComponent'
 import { showCart } from 'store/app/appSlice'
-const Header = () => {
+const Header = ({navigate}) => {
   const dispatch = useDispatch()
   const {current} = useSelector(state => state.user)
   const [isShowOption, setIsShowOption] = useState(false)
@@ -50,7 +50,7 @@ const Header = () => {
           current && <Fragment>
             
             <div 
-              onClick={() => dispatch(showCart())}
+              onClick={() => navigate(`/${path.DETAIL_CART}`)}
               className='flex items-center justify-center gap-2 border-r px-6 cursor-pointer'>
               <BsFillHandbagFill color='red'/>
               <span>{`${current?.cart?.length || 0} item(s)`}</span>
@@ -69,7 +69,10 @@ const Header = () => {
                 current?.role === 'admin' && <Link className='p-2 w-full hover:bg-sky-100' to={`/${path.ADMIN}/${path.DASHBOARD}`}>Admin Workspace</Link>
               }
                 
-                <span onClick={ () => dispatch(logout())} className='p-2 w-full hover:bg-sky-100' >Logout</span>
+                <span onClick={ () => {
+                  dispatch(logout())
+                  navigate('/')
+                }} className='p-2 w-full hover:bg-sky-100' >Logout</span>
               </div>}
             </div>
             </Fragment>

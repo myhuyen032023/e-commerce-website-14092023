@@ -60,7 +60,6 @@ const Products = ({q}) => {
     else setActiveClick(name)
   }, [activeClick])
 
-  console.log(category)
   return (
     <div className='w-full'>
       <div className='h-[81px] bg-gray-100 flex items-center justify-center'>

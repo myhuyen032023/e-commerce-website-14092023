@@ -11,8 +11,9 @@ router.post('/refreshToken', ctrls.refreshAccessToken);
 router.get('/logout', ctrls.logout);
 router.post('/forgotpassword', ctrls.forgotPassword);
 router.put('/resetpassword', ctrls.resetPassword);
-router.put('/cart', verifyAccessToken,ctrls.updateCart);
 router.delete('/remove-cart/:pid', verifyAccessToken,ctrls.removeProductInCart);
+router.put('/cart', verifyAccessToken,ctrls.updateCart);
+
 
 
 

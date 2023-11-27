@@ -22,6 +22,7 @@ const Product = ({productData, isNew, normal, navigate}) => {
     if(flag=== 'CART') {
       if(!current) return toast.info('Please login first')
       const response = await apiUpdateCart({pid: productData._id, color: productData.color})
+    
       if(response.success) toast.success('Add to Cart Successfully!')
       else toast.error('Something went wrong')
 
@@ -46,7 +47,7 @@ const Product = ({productData, isNew, normal, navigate}) => {
             <span onClick={(e) => handleClickOptions(e, 'QUICK_VIEW')}><SelectOption icon={<AiFillEye />}/></span>
             <span onClick={(e) => handleClickOptions(e, 'WISHLIST')}><SelectOption icon={<AiFillHeart />}/></span>
             
-            {!current?.cart?.some(el => el.product === productData._id) && <span onClick={(e) => handleClickOptions(e, 'CART')}><SelectOption icon={<BsCartPlusFill />}/></span>}
+            {!current?.cart?.some(el => el.product._id === productData?._id.toString()) && <span onClick={(e) => handleClickOptions(e, 'CART')}><SelectOption icon={<BsCartPlusFill />}/></span>}
           
           </div>}
           
