@@ -33,10 +33,10 @@ const CartItem = ({el, handleUpdateQuantity, defaultQuantity=1, dispatch}) => {
         <div  className='w-main mx-auto font-bold grid grid-cols-10 py-3 border-b'>
            <span className='col-span-6 w-full text-center'>
             <div  className='flex  gap-2 px-4 py-3'>
-                  <img src={el.product.thumb} alt="thumb" className='w-28 h-28 object-cover' />
+                  <img src={el?.product?.thumb} alt="thumb" className='w-28 h-28 object-cover' />
                   <div className='flex flex-col gap-1 items-start justify-center'>
-                      <span className='font-sm text-main'>{el?.product.title}</span>
-                      <span className='text-[10px]'>{el?.product.color}</span>
+                      <span className='font-sm text-main'>{el?.product?.title}</span>
+                      <span className='text-[10px]'>{el?.product?.color}</span>
                   </div>
 
               </div>
@@ -51,7 +51,7 @@ const CartItem = ({el, handleUpdateQuantity, defaultQuantity=1, dispatch}) => {
                   </div>
           </span>
           <span className='col-span-3 w-full text-center h-full flex items-center justify-center'>
-          <span>{formatMoney(el?.product.price * quantity)} VND</span>
+          <span>{formatMoney(el?.product?.price * quantity)} VND</span>
           </span>
           
       </div>

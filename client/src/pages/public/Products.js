@@ -18,19 +18,19 @@ const Products = ({q}) => {
   const [params] = useSearchParams()
   const {category} = useParams()
   
-  const fetchProductsByCategory = async(queries) => {
-    let data = {}
-    if (category !== ':category') data = {...queries, category}
-    else data = queries
+  const fetchProductsByCategory = async(data) => {
     const response = await apiGetProducts(data);
     if(response.success) setProducts(response.products)
   }
 
   useEffect(() => {
     const queries = {}
+    console.log(params.entries())
     for (let i of params.entries()){
       queries[i[0]] = i[1]
     } 
+
+    console.log(queries)
 
     let priceQuery = {}
     if (queries.to && queries.from) {

@@ -16,7 +16,7 @@ const DealDaily = () => {
   const [expire, setExpired] = useState(false)
 
   const fetchDealDaily = async() => {
-      const response = await apiGetProducts({limit: 1, page: Math.round(Math.random() * 3  ), totalRatings: 5})
+      const response = await apiGetProducts({limit: 1, page: Math.round(Math.random() * 3  )})
       if (response.success) {
         setDealDaily(response.products[0])
         const h = 24 - new Date().getHours()

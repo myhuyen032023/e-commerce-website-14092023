@@ -56,7 +56,7 @@ const SearchItem = ({name, activeClick, changeActiveClick, type='checkbox'}) => 
   useEffect(() => {
     const queries = {}
     if (Number(price.from) > 0) queries.from = price.from
-    if (Number(price.to) > 0) queries.from = price.to
+    if (Number(price.to) > 0) queries.to = price.to
 
     navigate({
       pathname: `/${category}`,

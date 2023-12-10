@@ -47,7 +47,7 @@ const Product = ({productData, isNew, normal, navigate}) => {
             <span onClick={(e) => handleClickOptions(e, 'QUICK_VIEW')}><SelectOption icon={<AiFillEye />}/></span>
             <span onClick={(e) => handleClickOptions(e, 'WISHLIST')}><SelectOption icon={<AiFillHeart />}/></span>
             
-            {!current?.cart?.some(el => el.product._id === productData?._id.toString()) && <span onClick={(e) => handleClickOptions(e, 'CART')}><SelectOption icon={<BsCartPlusFill />}/></span>}
+            {!current?.cart?.some(el => el.product?._id === productData?._id.toString()) && <span onClick={(e) => handleClickOptions(e, 'CART')}><SelectOption icon={<BsCartPlusFill />}/></span>}
           
           </div>}
           

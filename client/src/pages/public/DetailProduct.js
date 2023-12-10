@@ -25,12 +25,16 @@ const DetailProduct = ({dispatch}) => {
   const [product, setProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
   const [relatedProducts, setRelatedProducts] = useState([])
+  const [update, setUpdate] = useState(false)
  
 
   const fetchProductData = async() => {
     const response = await apiGetProduct(pid)
     // console.log(response)
-    if (response.success) setProduct(response.productData)
+    if (response.success) {
+      setProduct(response.productData)
+      
+    }
   }
 
   const fetchProducts = async() => {
@@ -46,19 +50,23 @@ const DetailProduct = ({dispatch}) => {
     } 
   }, [])
 
+  const rerender = useCallback(() => {
+    setUpdate(!update)
+  },[update])
+
   useEffect(() => {
     if (pid) {
       fetchProductData()
       fetchProducts()
     }
-  }, [pid, current])
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  }, [pid, current, update])
   
   const handleChangeQuantity = useCallback((flag) => {
       if (flag === 'minus' && quantity === 1) return
       if (flag === 'minus') setQuantity(prev => +prev - 1)
       if (flag === 'plus') setQuantity(prev => +prev + 1)
   }, [quantity])
-console.log(product)
   const handleAddToCart = async() => {
     
       if(!current) return toast.info('Please login first')
@@ -134,7 +142,7 @@ console.log(product)
                   handleChangeQuantity={handleChangeQuantity}
                   />
               </div>
-              {!current?.cart?.some(el => el.product._id === product?._id.toString()) ? <Button fullWidth handleOnClick={() => {handleAddToCart()}}>Add to Cart</Button> : <Button fullWidth >Added To Cart</Button>}
+              {!current?.cart?.some(el => el.product?._id === product?._id.toString()) ? <Button fullWidth handleOnClick={() => {handleAddToCart()}}>Add to Cart</Button> : <Button fullWidth >Added To Cart</Button>}
             </div>
         </div>
         <div className='w-1/5'>
@@ -152,7 +160,8 @@ console.log(product)
       </div>
 
       <div className='w-main m-auto mt-8'>
-        <ProductInformation />
+        <ProductInformation 
+        totalRatings={product?.totalRatings} ratings={product?.ratings} product={product} rerender={rerender}/>
       </div>
 
       <div  className='w-main m-auto mt-8'>

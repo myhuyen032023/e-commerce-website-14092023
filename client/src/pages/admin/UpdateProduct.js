@@ -67,8 +67,7 @@ const UpdateProduct = ({editProduct, render, setEditProduct}) => {
     }, [editProduct])
 
     useEffect(() => {
-        console.log(watch('thumb') instanceof FileList && watch('thumb').length > 0)
-        console.log(watch('thumb'))
+        
         if ( watch('thumb') instanceof FileList && watch('thumb').length > 0) handlePreviewThumb(watch('thumb')[0])
     
         }, [watch('thumb')])
@@ -90,16 +89,16 @@ const UpdateProduct = ({editProduct, render, setEditProduct}) => {
           if (data.category) data.category = categories?.find(el => el.title === data.category)?.title
           
           const finalPayload = {...data, ...payload}
+          finalPayload.thumb = data?.thumb?.length === 0 ? preview.thumb : data.thumb[0]
           console.log(finalPayload)
 
           const formData = new FormData()
           for (let i of Object.entries(finalPayload)) formData.append(i[0], i[1])
-    
-          if (finalPayload.thumb) formData.append('thumb', finalPayload?.thumb?.length === 0 ? preview.thumb : finalPayload.thumb[0])
-          if (finalPayload.images) {
-            const images = finalPayload?.image?.length === 0 ? preview.images : finalPayload.images
-            for(let image of images) formData.append('images', image)
-          }
+          
+          finalPayload.images = data.images?.length === 0 ? preview.images : data.images
+          for(let image of finalPayload.images) formData.append('images', image)
+          
+          console.log(formData)
     
           const response = await apiUpdateProduct(formData, editProduct._id)
           console.log(response)
@@ -233,7 +232,7 @@ const UpdateProduct = ({editProduct, render, setEditProduct}) => {
             <img src={preview?.thumb} alt="thumb" className='w-[200px] object-contain'/>
           </div>}
 
-          <div className='flex flex-col gap-2 mt-8'>
+          <div className='flex flex-col gap-2 mt-8'>  
             <label htmlFor="products" className='text-sm font-bold'> Upload Images</label>
             <input type="file" id='images' multiple {...register('images')}/>
           

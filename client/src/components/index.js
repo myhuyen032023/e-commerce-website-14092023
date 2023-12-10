@@ -12,6 +12,7 @@ export {default as CountDown} from './Common/CountDown'
 export {default as FeaturedProduct} from './Products/FeaturedProduct'
 export {default as ProductCard} from './Products/ProductCard'
 export {default as CustomSlider} from './Common/CustomSlider'
+export {default as Modal} from './Common/Modal'
 export {default as TopHeader} from './Header/TopHeader'
 export {default as Footer} from './Footer/Footer'
 export {default as InputField} from './Inputs/InputField'
@@ -26,5 +27,8 @@ export {default as Select} from './Inputs/Select'
 export {default as MarkdownEditor} from './Inputs/MarkdownEditor'
 
 export {default as MemberSidebar} from './Sidebar/MemberSidebar'
-
+export {default as Votebar} from './Vote/Votebar'
+export {default as Ratings} from './Vote/Ratings'
+export {default as VoteOptions} from './Vote/VoteOptions'
+export {default as Comment} from './Vote/Comment'
 

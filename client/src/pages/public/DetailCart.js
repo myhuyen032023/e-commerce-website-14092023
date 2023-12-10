@@ -47,7 +47,7 @@ const handleCheckout= () => {
       {currentCart?.length > 0 && <div className='w-main mx-auto flex flex-col justify-center items-end gap-3 mb-12'>
         <span>
           <span>Subtotal: </span>
-          <span>{formatMoney(currentCart?.reduce((sum, el) =>  +el?.product.price * el.quantity + sum, 0))} VND</span>
+          <span>{formatMoney(currentCart?.reduce((sum, el) =>  +el?.product?.price * el.quantity + sum, 0))} VND</span>
         </span>
 
         <Button handleOnClick={() => handleCheckout()}>Checkout</Button>

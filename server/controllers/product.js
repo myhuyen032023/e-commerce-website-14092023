@@ -141,7 +141,7 @@ const getProducts = asyncHandler(async(req, res) => {
 const updateProduct = asyncHandler(async(req, res) => {
     const {pid} = req.params
     const files = req?.files
-    if (files?.thumb) req.body.thumb = files.thumb[0]?.path
+    if (files?.thumb) req.body.thumb = files?.thumb[0]?.path
     if (files?.images) req.body.images = files?.images?.map(el => el.path)
     if (req.body && req.body.title) req.body.slug = slugify(req.body.title)
     const updatedProduct = await Product.findByIdAndUpdate(pid, req.body, {new: true});
@@ -163,7 +163,7 @@ const deleteProduct = asyncHandler(async(req, res) => {
 
 const ratings = asyncHandler(async(req, res) => {
     const {_id} = req.user;
-    const {star, comment, pid} = req.body;
+    const {star, comment, pid, updatedAt} = req.body;
     if (!star || !pid) throw new Error("Missing Input")
 
     const ratingProduct = await Product.findById(pid);
@@ -175,12 +175,12 @@ const ratings = asyncHandler(async(req, res) => {
         await Product.updateOne({
             ratings: { $elemMatch: alreadyRating}
         }, {
-            $set: {"ratings.$.star": star, "ratings.$.comment": comment}
+            $set: {"ratings.$.star": star, "ratings.$.comment": comment, "ratings.$.updatedAt": updatedAt}
         }, {new: true})
     } else {
         // add star & comment
         await Product.findByIdAndUpdate(pid, {
-            $push: {ratings: {star, comment, postedBy: _id}}
+            $push: {ratings: {star, comment, postedBy: _id, updatedAt}}
         }, {new: true})
 
         // console.log(response)
@@ -190,7 +190,9 @@ const ratings = asyncHandler(async(req, res) => {
     const updatedProduct = await Product.findById(pid)
     const ratingCount = updatedProduct.ratings.length
     const sumRatings = updatedProduct.ratings.reduce((sum, el) => sum + +el.star, 0)
-    updatedProduct.totolRatings = Math.round(sumRatings * 10 / ratingCount) /10
+    updatedProduct.totalRatings = Math.round(sumRatings * 10 / ratingCount) /10
+
+    await updatedProduct.save()
 
     return res.status(200).json({
         status: true,

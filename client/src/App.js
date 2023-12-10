@@ -8,17 +8,19 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AdminLayout, Dashboard,OrderManagement, ProductManagement, UserManagement, CreateProduct} from './pages/admin'
 import { MemberLayout, Personal, MyCart, Wishlist, History} from './pages/member'
-import { Cart } from 'components';
+import { Cart, Modal } from 'components';
 function App() {
 
   const dispatch = useDispatch()
-  const {isShowCart} = useSelector(state => state.app)
+  const {isShowCart, isShowModal, modalChildren} = useSelector(state => state.app)
   useEffect(() => {;
     dispatch(getCategories())
   }, [dispatch])
 
   return (
-  <div className="min-h-screen font-main">
+  <div className=" font-main relative">
+
+    {isShowModal && <Modal>{modalChildren}</Modal>}
     {isShowCart && <div className='absolute inset-0 bg-overlay z-50 flex justify-end'>
       <Cart />
     </div>}

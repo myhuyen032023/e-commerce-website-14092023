@@ -28,3 +28,9 @@ export const apiDeleteProduct = (pid) => axios({
     url: '/product/' + pid,
     method: 'delete'
 })
+
+export const apiRatingProduct = (data) => axios({
+    url: '/product/ratings',
+    method: 'put',
+    data
+})
