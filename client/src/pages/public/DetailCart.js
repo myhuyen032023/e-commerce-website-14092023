@@ -7,8 +7,10 @@ import { toast } from 'react-toastify'
 import { getCurrent } from 'store/user/asyncActions'
 import { updateCart } from 'store/user/userSlice'
 import { formatMoney } from 'utils/helpers'
+import { Link } from 'react-router-dom'
+import path from 'utils/path'
 
-const DetailCart = ({dispatch}) => {
+const DetailCart = ({dispatch, navigate}) => {
 
   const {currentCart} = useSelector(state => state.user)
 
@@ -19,10 +21,7 @@ const DetailCart = ({dispatch}) => {
 
   
   
-// console.log(currentCart)
-const handleCheckout= () => {
-  toast.success('Checkout Successfully!')
-}
+
   return (
     <div>
       {
@@ -49,8 +48,8 @@ const handleCheckout= () => {
           <span>Subtotal: </span>
           <span>{formatMoney(currentCart?.reduce((sum, el) =>  +el?.product?.price * el.quantity + sum, 0))} VND</span>
         </span>
-
-        <Button handleOnClick={() => handleCheckout()}>Checkout</Button>
+        
+        <Button handleOnClick={() => navigate(`/${path.CHECKOUT}`)} >Checkout</Button>
       </div>}
     </div>
     :

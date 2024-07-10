@@ -1,6 +1,7 @@
 import React, {memo} from 'react'
 import Slider from 'react-slick'
 import Product from 'components/Products/Product';
+import Blog from 'components/Blogs/Blog';
 const settings = {
     dots: false,
     infinite: true,
@@ -9,7 +10,7 @@ const settings = {
     slidesToScroll: 1
   };
 
-const CustomSlider = ({products, activeTab, normal}) => {
+const CustomSlider = ({products, activeTab, normal, blogs}) => {
   return (
     <div>
         {
@@ -24,6 +25,18 @@ const CustomSlider = ({products, activeTab, normal}) => {
                 />
             ))}
         </Slider>
+        }
+
+        {
+          blogs && 
+          <Slider {...settings}>
+          {blogs.map(el => (
+              <Blog 
+                  id={el._id}
+                  blogData={el}
+              />
+          ))}
+      </Slider>
         }
         
     </div>

@@ -17,6 +17,7 @@ const Personal = () => {
       mobile: current?.mobile,
       email: current?.email,
       avatar: current?.avatar,
+      address: current?.address
     })
   }, [current])
 
@@ -90,6 +91,15 @@ const Personal = () => {
                   value: /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im,
                   message: "invalid phone number"
                 }
+              }}
+            />
+            <InputForm 
+              label='Address'
+              register={register}
+              errors={errors}
+              id='address'
+              validate={{
+                required: 'Require this field'
               }}
             />
 

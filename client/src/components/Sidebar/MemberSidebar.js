@@ -71,6 +71,7 @@ const MemberSidebar = () => {
               </Fragment>
           ))
         }
+        <NavLink to={`/`} className={clsx(notActivedStyle, 'pl-4')}>Home</NavLink>
       </div>
     </div>
   )

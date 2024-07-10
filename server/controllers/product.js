@@ -40,6 +40,7 @@ const getProduct = asyncHandler(async(req, res) => {
 
 const getProducts = asyncHandler(async(req, res) => {
     const queries = {...req.query};
+    console.log(queries)
     //Tach cac truong dac biet khoi queries
     const excludeFields = ["limit", "sort", "page", "fields"]; 
     excludeFields.forEach(el => delete queries[el])
@@ -195,7 +196,7 @@ const ratings = asyncHandler(async(req, res) => {
     await updatedProduct.save()
 
     return res.status(200).json({
-        status: true,
+        success: true,
         updatedProduct
     })
 })
@@ -210,7 +211,9 @@ const uploadProductImage = asyncHandler(async(req, res) => {
     })
 })
 
-
+const getRecommendProduct = asyncHandler(async(req, res) => {
+    
+})
 
 
 module.exports = {

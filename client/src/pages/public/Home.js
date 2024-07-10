@@ -1,19 +1,80 @@
+import withBaseComponent from 'hocs/withBaseComponent'
 import {Sidebar, Banner, BestSeller, DealDaily, FeaturedProduct} from '../../components'
-
 import {CustomSlider} from '../../components/'
 import { useSelector } from 'react-redux'
 
+import RecommendedProduct from 'components/Products/RecommendedProduct'
 
-const Home = () => {
-  const {newProducts} = useSelector(state => state.products) 
+import { apiGetRecommendProducts, apiGetProducts } from 'apis';
+import { useEffect, useState } from 'react'
+import { setSearchProducts, setDiscountProducts } from 'store/products/productSlice'
+const Home = ({navigate, dispatch}) => {
+  const {newProducts, searchProducts} = useSelector(state => state.products) 
   const {categories} = useSelector(state => state.app) 
-  // const {isLoggedIn, current} = useSelector(state => state.user)
-  // console.log({isLoggedIn, current})
+  const {blogs} = useSelector(state => state.blogs)
+  
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [visibleProductIndex, setVisibleProductIndex] = useState(0);
+  const [isShowing, setIsShowing] = useState(false);
 
+  const getRecommendProduct = async() => {
+    const response = await apiGetRecommendProducts();
+    if (response.success) {
+      setRecommendedProducts(response.recommendedItems)
+    }
+  }
+
+  const fetchDiscountProducts = async() => {
+    const response = await apiGetProducts({limit: 30, sort: '-discount'})
+    if (response.success) {
+      dispatch(setDiscountProducts(response.products))
+      console.log("discountProducts")
+    }
+}
+
+useEffect(() => {
+  
+  fetchDiscountProducts()
+  
+}, [])
+
+
+  useEffect(() => {
+    getRecommendProduct()
+    if (searchProducts) {
+      dispatch(setSearchProducts([]))
+      
+    }
+    console.log(searchProducts)
+  }, []);
+
+
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsShowing(true);
+
+      setTimeout(() => {
+        setIsShowing(false);
+
+        setVisibleProductIndex((prevIndex) => (prevIndex + 1) % recommendedProducts.length);
+      }, 3000);
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [recommendedProducts]);
+
+  const currentProduct = recommendedProducts[visibleProductIndex];
+
+
+
+  
   return (
     <>
     
-    <div className='w-main flex pt-6'>
+    <div className='w-main flex pt-6 sticky'>
       <div className='flex flex-col gap-5 w-[25%] flex-auto'>
         <Sidebar />
         <DealDaily />
@@ -22,7 +83,6 @@ const Home = () => {
         <Banner />
         <BestSeller />
       </div>
-      
     </div>
 
     <div className='my-8 w-main'>
@@ -64,13 +124,29 @@ const Home = () => {
     </div>
 
     <div className='my-8 w-main'>
-      <h3 className='text-[20px] font-semibold py-[15px] border-b-2 border-main'>BLOGS POSTS</h3>
-
+    <h3 className='text-[20px] font-semibold py-[15px] border-b-2 border-main'>Blogs</h3>
+      <div className='w-full mt-4 mx-[-10px] '>
+        <CustomSlider blogs={blogs}/>
+      </div>
+      
     </div>
+
+    
+
+    <div className="fixed bottom-0 left-0 flex flex-wrap gap-4 shadow-2xl rounded-2xl bg-white max-w-[400px]">
+    {isShowing && currentProduct && (
+      <RecommendedProduct
+      image={currentProduct.thumb}
+      name={currentProduct.title}
+      price={currentProduct.price}
+      link={`/${currentProduct.category.toLowerCase()}/${currentProduct._id}/${currentProduct.title}`}
+      />
+    )}
+      </div>
     
     </>
     
   )
 }
 
-export default Home
+export default withBaseComponent(Home)

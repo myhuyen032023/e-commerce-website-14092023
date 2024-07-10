@@ -74,7 +74,7 @@ const UserManagement = () => {
   }, [queriesDebounce, editEl, update])
   
   return (
-    <div className={clsx('w-full', editEl &&  'pl-20')}>
+    <div className={clsx('w-full')}>
       <h1 className='h-[75px] flex justify-between items-center text-3xl font-bold px-4 border-b'>
         <span>Users</span>
       </h1>

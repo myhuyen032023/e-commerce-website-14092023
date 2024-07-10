@@ -1,11 +1,13 @@
 const { model } = require('mongoose');
 const User = require('../models/user');
+const Product = require("../models/product")
 const asyncHandler = require('express-async-handler');
 const {generateAccessToken, generateRefreshToken} = require('../middlewares/jwt'); 
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail");
 const crypto = require("crypto");
-const makeToken = require("uniqid")
+const makeToken = require("uniqid");
+const recommendItemsForUser = require('../utils/findRecommendProducts');
 
 // const register = asyncHandler(async(req, res) => {
 //     const {email, password, firstname, lastname} = req.body;
@@ -44,15 +46,17 @@ const register = asyncHandler(async(req, res) => {
     } else {
         const token = makeToken()
         res.cookie('dataregister', {... req.body, token}, {httpOnly: true, maxAge: 15 * 60 * 1000})
-        const html = `Vui lòng click vào link dưới đây để hoàn tất quá trình đăng kí. Link sẽ hết hạn trong 15 phút tới. 
-        <a href=${process.env.URL_SERVER}/api/user/finalregister/${token}>Click here</a>`;
+        // const html = `Vui lòng click vào link dưới đây để hoàn tất quá trình đăng kí. Link sẽ hết hạn trong 15 phút tới. 
+        // <a href=${process.env.URL_SERVER}/api/user/finalregister/${token}>Click here</a>`;
         
 
-        await sendMail({email, html, subject: "Hoàn tất đăng kí Digital World"})
+        // await sendMail({email, html, subject: "Hoàn tất đăng kí Digital World"})
+        const newUser = await User.create({email, password, mobile, firstname, lastname});
 
         return res.json({
             success: true,
-            mes: "Please check your email to activate account"
+            mes: "Please check your email to activate account",
+            newUser
         })
     }
     
@@ -283,8 +287,8 @@ const deleteUser = asyncHandler(async(req, res) => {
 
 const updateUser = asyncHandler(async(req, res) => {
     const {_id} = req.user;
-    const {firstname, lastname, email, avatar, mobile} = req.body
-    const data = {firstname, lastname, email, avatar, mobile}
+    const {firstname, lastname, email, mobile, address} = req.body
+    const data = {firstname, lastname, email, mobile, address}
     if (req.file) data.avatar = req.file.path
     if(!_id || Object.keys(req.body).length === 0) throw new Error('Missing Inputs')
     const response = await User.findByIdAndUpdate(_id, data, {new: true}).select("-password -role -refreshToken");
@@ -359,6 +363,41 @@ const removeProductInCart = asyncHandler(async(req, res) => {
     })
 })
 
+// Lấy tất cả thông tin sản phẩm từ database
+const getRecommendProduct = asyncHandler(async(req, res) => {
+    const {_id} = req.user
+    // Truy vấn cơ sở dữ liệu
+    const results = await Product.aggregate([
+        { $unwind: "$ratings" },
+        {
+          $lookup: {
+            from: "users",
+            localField: "ratings.postedBy",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        {
+          $project: {
+            productId: "$_id",
+            star: "$ratings.star",
+            userId: { $arrayElemAt: ["$user._id", 0] }
+          },
+        },
+      ]);
+    const data = results.map(result => ({
+    userId: result.userId,
+    itemId: result.productId,
+    rating: result.star
+    }));
+    const recommendedItems = recommendItemsForUser(data, _id, 3)
+    const recommendedProductData = await Product.find({ _id: { $in: recommendedItems } })
+    return res.status(200).json({
+        success: recommendedProductData ? true : false,
+        recommendedItems: recommendedProductData ? recommendedProductData : 'Something went wrong'
+    })
+})
+
 
 module.exports = {
     register,
@@ -374,7 +413,8 @@ module.exports = {
     updateUserByAdmin,
     updateCart,
     finalRegister,
-    removeProductInCart
+    removeProductInCart,
+    getRecommendProduct
 }
 
 

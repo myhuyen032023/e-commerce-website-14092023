@@ -117,11 +117,17 @@ const UpdateProduct = ({editProduct, render, setEditProduct}) => {
       
     return (
     <div className='w-full flex flex-col gap-4 relative pl-8'>
-         <div className='h-[70px] w-full'></div>
-         <div className='p-4 border-b  flex justify-between items-center fixed top-0 right-0 left-[327px]'>
+         {/* <div className='h-[70px] w-full'></div>
+         <div className='p-4 border-b  flex justify-between items-center fixed top-0 right-0 left-[350px]'>
             <h1 className='text-3xl font-bold tracking-tight'>Update Product</h1>
-            <span className='text-main hover:underline cursor-pointer' onClick={() => setEditProduct(null)}>Cancel</span>
-        </div>
+            
+        </div> */}
+
+        <h1 className='h-[75px] flex justify-between items-center text-3xl font-bold px-4 border-b'>
+          <span>Products</span>
+          <span className='text-main hover:underline cursor-pointer text-sm' onClick={() => setEditProduct(null)}>Cancel</span>
+          
+        </h1>
 
         <div className='p-4'>
         <form onSubmit={handleSubmit(handleUpdateProduct)}>
@@ -251,7 +257,7 @@ const UpdateProduct = ({editProduct, render, setEditProduct}) => {
           <div className='my-6'>
 
 
-           <Button type='submit'>Update New Product</Button>
+           <Button type='submit'>Update</Button>
           </div>
         </form>
       </div>

@@ -2,7 +2,7 @@ import React , {memo, useState, useCallback} from 'react'
 import { productInfoTabs } from 'utils/constants'
 import Votebar from 'components/Vote/Votebar'
 import { renderStarFromNumber } from 'utils/helpers'
-import { apiRatingProduct } from 'apis'
+
 import Button from 'components/Buttons/Button'
 import VoteOptions from 'components/Vote/VoteOptions'
 import { useDispatch } from 'react-redux'
@@ -25,16 +25,7 @@ const ProductInformation = ({totalRatings, ratings, product, rerender}) => {
         star: ''
     })
 
-    const handleSubmitVoteOption = async({star, comment}) => {
-        console.log({star, comment})
-        if (!star || !comment) {
-            alert('Please write your comment and rate product')
-            return
-        }
-        await apiRatingProduct({star, comment, pid: product?._id, updatedAt: Date.now()})
-        rerender()
-        dispatch(showModal({isShowModal: false, modalChildren: null}))
-    }
+    
 
     const handleVoteNow = () => {
         if (!isLoggedIn) {
@@ -50,7 +41,7 @@ const ProductInformation = ({totalRatings, ratings, product, rerender}) => {
                 }
             }) 
         } else {
-            dispatch(showModal({isShowModal: true, modalChildren: <VoteOptions productName={product?.title} handleSubmitVoteOption={handleSubmitVoteOption}/>}))
+            dispatch(showModal({isShowModal: true, modalChildren: <VoteOptions product={product}/>}))
         }
     }
   return (

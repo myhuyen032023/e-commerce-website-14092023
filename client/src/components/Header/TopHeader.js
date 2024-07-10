@@ -24,7 +24,7 @@ const TopHeader = () => {
 
   }, [dispatch, isLoggedIn])
   return (
-    <div className='h-[30px] w-full bg-main itmes-center flex justify-center'>
+    <div className='h-[30px] w-full bg-main items-center flex justify-center'>
         <div className='w-main flex items-center justify-between text-white text-xs'>
             <span>ORDER ONLINE OR CALL USE (+1800) 000 8808</span>
             {(isLoggedIn && current) ? 

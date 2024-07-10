@@ -172,7 +172,7 @@ const Login = () => {
             
           
             <div className='flex items-center justify-between my-2 w-full text-sm'>
-              {!isRegister && <span className='text-blue-500 hover:underline cursor-pointer' onClick={() => setUserForgotPassword(true)}>Forgot your account?</span>}
+              {!isRegister && <span className='text-blue-500 hover:underline cursor-pointer' onClick={() => setUserForgotPassword(true)}>Forgot password?</span>}
               { !isRegister && <span 
                 className='text-blue-500 hover:underline cursor-pointer'
                 onClick={() => setIsRegister(true)}

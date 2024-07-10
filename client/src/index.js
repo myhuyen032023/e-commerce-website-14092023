@@ -6,7 +6,6 @@ import App from './App';
 import './index.css';
 import { BrowserRouter } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
-
 const container = document.getElementById('root');
 const root = createRoot(container);
 
@@ -15,6 +14,7 @@ root.render(
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
           <App/>
+          
         </BrowserRouter>
 
       </PersistGate>

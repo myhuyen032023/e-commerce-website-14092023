@@ -1,24 +1,41 @@
 import React, {memo, useState, useEffect} from 'react'
 import {navigation} from 'utils/constants'
-import {NavLink} from 'react-router-dom'
+import {NavLink, useSearchParams} from 'react-router-dom'
 import InputField from 'components/Inputs/InputField'
 import useDebounce from 'hooks/useDebounce'
 import { apiGetProducts } from 'apis'
 import path from 'utils/path'
 import { useNavigate } from 'react-router-dom'
-const Navigation = () => {
-  const navigate = useNavigate()
-  const [title, setTitle] = useState({
-    title: ''
-  })
+import { useForm } from 'react-hook-form'
+import InputForm from 'components/Inputs/InputForm'
+import withBaseComponent from 'hocs/withBaseComponent'
+import { setSearchProducts } from 'store/products/productSlice'
+const Navigation = ({dispatch, navigate}) => {
+  const {register, formState: {errors}, reset, watch} = useForm()
+  const [params] = useSearchParams()
+
   
 
-  const titleDebounce = useDebounce(title.title, 800) 
-  useEffect(() => {
-    if (titleDebounce !== '')
-    navigate(`${path.PRODUCTS}`)
-  }, [titleDebounce])
+  const fetchProducts = async (params) => {
+    const response = await apiGetProducts(params)
+    if (response.success) {
+      dispatch(setSearchProducts(response))
+      console.log(response)
+      navigate(`/${path.PRODUCTS}`) 
+    }
+  }
 
+  const queryDebounce = useDebounce(watch('q'), 800)
+  useEffect(() => {
+    const searchParams = Object.fromEntries([...params])
+    if (queryDebounce !== '') {
+      searchParams.q = queryDebounce
+      fetchProducts(searchParams) 
+      reset()
+    }
+  }, [queryDebounce])
+
+  
   
   return (
     <div className='w-main h-[48px] py-2 border-y flex text-sm items-center'>
@@ -33,23 +50,23 @@ const Navigation = () => {
         </NavLink>
       ))}
 
-      {/* <div>
-      <div className='flex justify-end '>
-          <InputField
-            nameKey={'title'}
-            value={title.title}
-            setValue={setTitle}
-            style='w-[800px]'
-            placeholder='Search product name...'
-            fullWidth={true}
-            isHideLabel={true}
+      <div>
+      <div className='flex w-full justify-end items-center px-8'>
+        <form className='w-full'>
+
+          <InputForm 
+            id='q'
+            register={register}
+            errors={errors}
+            placeholder="Search Product by title, description..."
           />
-        </div>
-      </div> */}
+        </form>
+      </div>
+      </div>
 
         
     </div>
   )
 }
 
-export default memo(Navigation)
+export default withBaseComponent(memo(Navigation))

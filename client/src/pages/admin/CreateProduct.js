@@ -39,11 +39,13 @@ const CreateProduct = () => {
       const response = await apiCreateProduct(formData)
       if (response.success) {
         reset()
+        window.location.reload()
         toast.success('Create Product Successfully!')
         setPayload({
           thumb: '',
           images: []
         })
+
       } else toast.error('Something Went Wrong')
     }
   }

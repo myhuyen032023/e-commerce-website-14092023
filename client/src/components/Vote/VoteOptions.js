@@ -3,26 +3,39 @@ import logo from 'assets/logo1.png'
 import { voteOptions } from 'utils/constants'
 import { AiFillStar } from 'react-icons/ai'
 import Button from 'components/Buttons/Button'
-
-
-
-const VoteOptions = ({productName, handleSubmitVoteOption}) => {
+import { apiRatingProduct } from 'apis'
+import { showModal } from 'store/app/appSlice'
+import withBaseComponent from 'hocs/withBaseComponent'
+import { toast } from 'react-toastify'
+const VoteOptions = ({product, dispatch}) => {
   const modalRef = useRef()
   
   const [chosenStar, setChosenStar] = useState(0)
 
   const [comment, setComment] = useState('')
-
+console.log(product)
   useEffect(() => {
     modalRef.current.scrollIntoView({block:'center', behavior: 'smooth'})
 
   }, [])
 
+  const handleSubmitVoteOption = async({star, comment}) => {
+    console.log({star, comment})
+    if (!star || !comment) {
+        alert('Please write your comment and rate product')
+        return
+    }
+    await apiRatingProduct({star, comment, pid: product?._id, updatedAt: Date.now()})
+    
+    toast.success('Rate Successfully!')
+    dispatch(showModal({isShowModal: false, modalChildren: null}))
+}
+
   return (
     <div onClick={e => e.stopPropagation()} ref={modalRef} className='bg-white w-[700px] p-4 flex flex-col items-center justify-center gap-4'>
       
       <img src={logo} alt="logo" className='w-[300px] object-contain'/>
-        <h2 className='text-center'>{productName}</h2>
+        <h2 className='text-center'>{product?.title}</h2>
         <textarea 
           value={comment}
           onChange={e => setComment(e.target.value)}
@@ -46,4 +59,4 @@ const VoteOptions = ({productName, handleSubmitVoteOption}) => {
   )
 }
 
-export default memo(VoteOptions)
+export default withBaseComponent(memo(VoteOptions))

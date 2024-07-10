@@ -4,12 +4,17 @@ import * as actions from './asyncActions';
 export const productSlice = createSlice({
     name: 'product',
     initialState: {
-        newProducts: [] 
+        newProducts: [],
+        searchProducts: [],
+        discountProducts: [] 
     },
     reducers: {
-        // logout: (state) => {
-        //     state.isLoading = false
-        // }
+        setSearchProducts: (state, action) => {
+            state.searchProducts = action.payload
+        },
+        setDiscountProducts: (state, action) => {
+            state.discountProducts = action.payload
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(actions.getNewProducts.pending, (state) => {
@@ -30,6 +35,6 @@ export const productSlice = createSlice({
 })
 
 
-
+export const {setSearchProducts, setDiscountProducts} = productSlice.actions
 
 export default productSlice.reducer

@@ -62,3 +62,8 @@ export const apiRemoveCart = ( pid) => axios({
     url: '/user/remove-cart/' + pid,
     method: 'delete',
 })
+
+export const apiGetRecommendProducts = () => axios({
+    url: '/user/recommendproducts',
+    method: 'get'
+})

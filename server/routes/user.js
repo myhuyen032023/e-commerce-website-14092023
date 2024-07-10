@@ -13,6 +13,7 @@ router.post('/forgotpassword', ctrls.forgotPassword);
 router.put('/resetpassword', ctrls.resetPassword);
 router.delete('/remove-cart/:pid', verifyAccessToken,ctrls.removeProductInCart);
 router.put('/cart', verifyAccessToken,ctrls.updateCart);
+router.get('/recommendproducts', verifyAccessToken,ctrls.getRecommendProduct);
 
 
 

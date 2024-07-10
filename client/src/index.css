@@ -5,6 +5,8 @@
 @import "slick-carousel/slick/slick.css";
 @import "slick-carousel/slick/slick-theme.css";
 
+
+
 button.slick-next {
     right: 80px;
     z-index: 10;
@@ -60,4 +62,53 @@ margin-bottom: 30px;
 
 .code {
     white-space: initial;
+}
+.trigger {
+    padding: 0 24px;
+    font-size: 18px;
+    line-height: 64px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.trigger:hover {
+    color: #1890ff;
+}
+
+.logo {
+    height: 64px;
+    margin: 0px;
+    background-color: rgb(30, 78, 105);
+    font-size: 36px;
+    margin-bottom: 50px;
+}
+
+.sm-logo {
+    display: none;
+}
+
+.ant-layout {
+    min-height: 100vh;
+}
+
+.ant-layout-sider {
+    flex: 0 0 250px !important;
+    max-width: 250px !important;
+    min-width: 250px !important;
+    width: 250px !important;
+}
+
+.ant-layout-sider-collapsed {
+    flex: 0 0 80px !important;
+    max-width: 80px !important;
+    min-width: 80px !important;
+    width: 80px !important;
+}
+
+.ant-layout-sider-collapsed .sm-logo {
+    display: block;
+}
+
+.ant-layout-sider-collapsed .lg-logo {
+    display: none;
 }

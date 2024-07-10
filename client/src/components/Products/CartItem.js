@@ -5,6 +5,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import { getCurrent } from 'store/user/asyncActions'
 import { formatMoney } from 'utils/helpers'
+import Button from 'components/Buttons/Button'
 
 const CartItem = ({el, handleUpdateQuantity, defaultQuantity=1, dispatch}) => {
   const [quantity, setQuantity] = useState(() => defaultQuantity)
@@ -36,7 +37,6 @@ const CartItem = ({el, handleUpdateQuantity, defaultQuantity=1, dispatch}) => {
                   <img src={el?.product?.thumb} alt="thumb" className='w-28 h-28 object-cover' />
                   <div className='flex flex-col gap-1 items-start justify-center'>
                       <span className='font-sm text-main'>{el?.product?.title}</span>
-                      <span className='text-[10px]'>{el?.product?.color}</span>
                   </div>
 
               </div>
@@ -50,9 +50,16 @@ const CartItem = ({el, handleUpdateQuantity, defaultQuantity=1, dispatch}) => {
                   />
                   </div>
           </span>
-          <span className='col-span-3 w-full text-center h-full flex items-center justify-center'>
+          <span className='col-span-2 w-full text-center h-full flex items-center justify-center'>
           <span>{formatMoney(el?.product?.price * quantity)} VND</span>
+          
           </span>
+
+          <span className='col-span-1 w-full text-center h-full flex items-center justify-center'>
+          <Button handleOnClick={() => removeItemFromCart(el.product?._id)} >x</Button>
+          
+          </span>
+          
           
       </div>
       

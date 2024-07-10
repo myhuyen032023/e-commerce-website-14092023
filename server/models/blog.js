@@ -10,27 +10,7 @@ var blogSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
-    category:{
-        type: mongoose.Types.ObjectId,
-        ref: "BlogCategory"
-    },
-    numberViews:{
-        type:Number,
-        default: 0
-    },
-    likes: [
-        {
-            type: mongoose.Types.ObjectId,
-            ref: 'User'
-        }
-    ],
-    dislikes: [
-        {
-            type: mongoose.Types.ObjectId,
-            ref: 'User'
-        }
-    ],
-    image: {
+    thumb: {
         type: String,
         default: 'https://img.freepik.com/free-photo/office-table-with-cup-coffee-keyboard-notepad_1220-4617.jpg'
     },
@@ -39,9 +19,7 @@ var blogSchema = new mongoose.Schema({
         default: 'Admin'
     }
 }, {
-    timestamps: true,
-    toJSON: {virtuals: true},
-    toObject: {virtuals: true}
+    timestamps: true
 });
 
 //Export the model

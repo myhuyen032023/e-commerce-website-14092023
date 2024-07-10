@@ -132,22 +132,23 @@ export const colors = [
 ]
 
 export const adminSidebar = [
+
     {
         id: 1,
         type: 'single',
-        text: 'DASHBOARD',
+        text: 'Dashboard',
         path: `/${path.ADMIN}/${path.DASHBOARD}`
     },
     {
         id: 2,
         type: 'single',
-        text: 'USER MANAGEMENT',
+        text: 'User Manangement',
         path: `/${path.ADMIN}/${path.MANAGE_USER}`
     },
     {
         id: 3,
         type: 'parent',
-        text: 'PRODUCT MANAGEMENT',
+        text: 'Product Management',
         submenu: [
             {
                 text: 'Create Product',
@@ -163,9 +164,26 @@ export const adminSidebar = [
     {
         id: 4,
         type: 'single',
-        text: 'ORDER MANAGEMENT',
+        text: 'Order Management',
         path: `/${path.ADMIN}/${path.MANAGE_ORDER}`
+    },
+    {
+        id: 5,
+        type: 'parent',
+        text: 'Blog Management',
+        submenu: [
+            {
+                text: 'Create Blog',
+                path: `/${path.ADMIN}/${path.CREATE_BLOG}`
+            },
+            {
+                text: 'Manage Blogs',
+                path: `/${path.ADMIN}/${path.MANAGE_BLOG}`
+            }
+        ]
+        
     }
+
 ]
 export const memberSidebar = [
     {
@@ -177,21 +195,15 @@ export const memberSidebar = [
     {
         id: 2,
         type: 'single',
-        text: 'My Cart',
-        path: `/${path.MEMBER}/${path.MY_CART}`
-    },
-    {
-        id: 3,
-        type: 'single',
         text: 'Buy History',
         path: `/${path.MEMBER}/${path.HISTORY}`
     },
-    {
-        id: 4,
-        type: 'single',
-        text: 'Wishlist',
-        path: `/${path.MEMBER}/${path.WISHLIST}`
-    },
+    // {
+    //     id: 3,
+    //     type: 'single',
+    //     text: 'Wishlist',
+    //     path: `/${path.MEMBER}/${path.WISHLIST}`
+    // },
 ]
 export const roles = [
     {

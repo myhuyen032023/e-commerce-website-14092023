@@ -9,9 +9,10 @@ import UpdateProduct from './UpdateProduct'
 import { apiDeleteProduct } from 'apis'
 import Swal from 'sweetalert2'
 import { toast } from 'react-toastify'
+import withBaseComponent from 'hocs/withBaseComponent'
 
 
-const ProductManagement = () => {
+const ProductManagement = ({dispatch}) => {
   const [params] = useSearchParams()
   const {register, formState: {errors}, handleSubmit, reset, watch} = useForm()
   const [products, setProducts] = useState([])
@@ -23,6 +24,7 @@ const ProductManagement = () => {
   }, [update])
 
   const fetchProducts = async (params) => {
+    params.sort = 'quantity'
     const response = await apiGetProducts(params)
     if (response.success) {
       console.log(response)
@@ -50,7 +52,7 @@ const ProductManagement = () => {
     const searchParams = Object.fromEntries([...params])
     if (queryDebounce) searchParams.q = queryDebounce
     fetchProducts(searchParams  )
-  }, [params, queryDebounce])
+  }, [params, queryDebounce, update])
 
 
   return (
@@ -62,10 +64,9 @@ const ProductManagement = () => {
         </div>
       }
 
-      <div className='h-[70px] w-full'></div>
-      <div className='p-4 border-b w-full flex justify-between items-center fixed top-0'>
-        <h1 className='text-3xl font-bold tracking-tight'>Product Manangement</h1>
-      </div>
+      <h1 className='h-[75px] flex justify-between items-center text-3xl font-bold px-4 border-b'>
+        <span>Products</span>
+      </h1>
 
       <div className='flex w-full justify-end items-center px-8'>
         <form className='w-[45%]'>
@@ -101,29 +102,29 @@ const ProductManagement = () => {
 
         <tbody>
           {products?.map((el, indx) => (
-            <tr key={el._id}>
-              <td className='text-center'>{indx+1}</td>
-              <td className='text-center'>
-                <img src={el.thumb} alt="thumb" className='w-12 h12 object-cover' />
-              </td>
+            <tr key={el._id} className={el.quantity < 10 && 'text-main font-bold'}>
+            <td className='text-center'>{indx+1}</td>
+            <td className='text-center'>
+              <img src={el.thumb} alt="thumb" className='w-12 h12 object-cover' />
+            </td>
 
-              <td className='text-center'>{el.title}</td>
-              <td className='text-center'>{el.brand}</td>
-              <td className='text-center'>{el.category}</td>
-              <td className='text-center'>{el.price}</td>
-              <td className='text-center'>{el.quantity}</td>
-              <td className='text-center'>{el.sold}</td>
-              <td className='text-center'>{el.color}</td>
-              <td className='text-center'>{el.totalRatings}</td>
-              <td className='text-center'>{moment(el.updatedAt).format('DD/MM/YYYY')}</td>
-              <td className='text-center'>
-                
-                  <span className='px-2 text-blue-700 hover:underline cursor-pointer'
-                    onClick={() => setEditProduct(el)}
-                  >Edit</span>
-                  <span onClick={() => handleDeleteProduct(el._id)} className='px-2 text-blue-700 hover:underline cursor-pointer'>Delete</span>
-              </td>
-            </tr>
+            <td className='text-center'>{el.title}</td>
+            <td className='text-center'>{el.brand}</td>
+            <td className='text-center'>{el.category}</td>
+            <td className='text-center'>{el.price}</td>
+            <td className='text-center'>{el.quantity}</td>
+            <td className='text-center'>{el.sold}</td>
+            <td className='text-center'>{el.color}</td>
+            <td className='text-center'>{el.totalRatings}</td>
+            <td className='text-center'>{moment(el.updatedAt).format('DD/MM/YYYY')}</td>
+            <td className='text-center'>
+              
+                <span className='px-2 text-blue-700 hover:underline cursor-pointer'
+                  onClick={() => setEditProduct(el)}
+                >Edit</span>
+                <span onClick={() => handleDeleteProduct(el._id)} className='px-2 text-blue-700 hover:underline cursor-pointer'>Delete</span>
+            </td>
+          </tr>
           ))}
         </tbody>
       </table>
@@ -131,4 +132,4 @@ const ProductManagement = () => {
   )
 }
 
-export default ProductManagement
+export default withBaseComponent(ProductManagement)

@@ -34,3 +34,37 @@ export const apiRatingProduct = (data) => axios({
     method: 'put',
     data
 })
+
+
+export const apiCreateOrder = (data) => axios({
+    url: '/order/',
+    method: 'post',
+    data
+})
+export const apiGetUserOrders = (params) => axios({
+    url: '/order/',
+    method: 'get',
+    params
+})
+export const apiGetOrders = (params) => axios({
+    url: '/order/admin',
+    method: 'get',
+    params
+})
+
+export const apiGetIncomeInDays = (params) => axios({
+    url: '/order/incomesindays',
+    method: 'get',
+    params
+})
+export const apiGetIncomeInMonths = (params) => axios({
+    url: '/order/incomesinmonths',
+    method: 'get',
+    params
+})
+
+export const apiUpdateStatus = (data) => axios({
+    url: '/order/status',
+    method: 'put',
+    data
+})

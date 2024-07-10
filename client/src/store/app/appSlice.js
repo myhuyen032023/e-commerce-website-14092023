@@ -7,7 +7,9 @@ export const appSlice = createSlice({
         categories: [],
         isLoading: false,
         isShowModal: false,
-        modalChildren: null
+        modalChildren: null,
+        isShowProductList: false,
+        productList: null
     },
     reducers: {
         showCart: (state) => {
@@ -17,6 +19,10 @@ export const appSlice = createSlice({
             state.isShowModal = action.payload.isShowModal
             state.modalChildren = action.payload.modalChildren
         
+        },
+        showProductList: (state, action) => {
+            state.isShowProductList = action.payload.isShowProductList
+            state.productList = action.payload.productList
         }
     },
     extraReducers: (builder) => {
@@ -39,7 +45,7 @@ export const appSlice = createSlice({
     }
 })
 
-export const {showCart, showModal} = appSlice.actions
+export const {showCart, showModal, showProductList} = appSlice.actions
 
 
 export default appSlice.reducer
